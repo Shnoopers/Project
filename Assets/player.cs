@@ -104,12 +104,12 @@ public class Player : Entity
             enemy.GetComponent<Enemy>().Damage();
         }      
             
-        Collider2D map = Physics2D.OverlapBox(transform.position, new Vector2(10f, 0.8f), _groundLayer);
-        if (map != null && map.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        Collider2D map = Physics2D.OverlapBox(transform.position, new Vector2(3f, 1.2f), 0f, _groundLayer);
+        if (map != null && !IsGrounded())
         {      
-            Debug.Log(map.gameObject.layer);
-            Vector2 direction = (map.transform.position - transform.position).normalized;
-            rb.AddForce(new Vector2(0f, 15f), ForceMode2D.Impulse);
+            float horizontalDirection = transform.position.x - map.bounds.center.x;
+            Vector2 direction = new Vector2(horizontalDirection, 15f).normalized;
+            rb.AddForce(direction * 8f, ForceMode2D.Impulse);
         }      
         
     }
@@ -118,7 +118,7 @@ public class Player : Entity
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 2f);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(transform.position, new Vector2(10f, 0.8f));
+        Gizmos.DrawWireCube(transform.position, new Vector2(3f, 1.2f));
     }
     private bool IsGrounded()
     {
