@@ -54,7 +54,7 @@ public class Enemy : Entity
     protected override void DamageBehavior()
     {
         _health -= 10;
-        rb.linearVelocity = new Vector2(-3 * rb.linearVelocityX, 0);
+        rb.linearVelocity = new Vector2(9f * Mathf.Sign(transform.position.x - _player.transform.position.x), 6f * Mathf.Sign(transform.position.y - _player.transform.position.y));
         Debug.Log(_health);
     }
 }
