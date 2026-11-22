@@ -44,6 +44,8 @@ public class Player : Entity
     // Update is called once per frame
     protected override void Update()
     {
+
+
         base.Update();
         if (Keyboard.current.escapeKey.wasPressedThisFrame)
         {
@@ -65,12 +67,16 @@ public class Player : Entity
             rb.linearVelocityY = _jumpForce;
         }
         if (Keyboard.current.aKey.isPressed)
+        {if (IsGrounded() == true || _cooldown <= 0f)
         {
             rb.linearVelocityX = -4;
         }
+        }
         if (Keyboard.current.dKey.isPressed)
+        {if (IsGrounded() == true || _cooldown <= 0f)
         {
             rb.linearVelocityX = 4;
+        }
         }
         if ((Keyboard.current.aKey.isPressed && Keyboard.current.dKey.isPressed) || (Keyboard.current.aKey.isPressed == false && Keyboard.current.dKey.isPressed == false))
         {
@@ -104,12 +110,13 @@ public class Player : Entity
             enemy.GetComponent<Enemy>().Damage();
         }      
             
-        Collider2D map = Physics2D.OverlapBox(transform.position, new Vector2(3f, 1.2f), 0f, _groundLayer);
+        Collider2D map = Physics2D.OverlapBox(transform.position, new Vector2(2.5f, 1.4f), 0f, _groundLayer);
         if (map != null && !IsGrounded())
         {      
             float horizontalDirection = transform.position.x - map.bounds.center.x;
             Vector2 direction = new Vector2(horizontalDirection, 15f).normalized;
             rb.AddForce(direction * 8f, ForceMode2D.Impulse);
+            rb.linearVelocityY += 8f;
         }      
         
     }
@@ -118,7 +125,7 @@ public class Player : Entity
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, 2f);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(transform.position, new Vector2(3f, 1.2f));
+        Gizmos.DrawWireCube(transform.position, new Vector2(2.5f, 1.4f));
     }
     private bool IsGrounded()
     {
