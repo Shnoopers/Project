@@ -104,20 +104,39 @@ public class Player : Entity
 
     private void Attack()
     {
-        Collider2D enemy = Physics2D.OverlapCircle(transform.position, 2f, _enemyLayer);
-        if (enemy != null)
-        {      
-            enemy.GetComponent<Enemy>().Damage();
-        }      
+        Vector3 mouseScreenPosition = Mouse.current.position.ReadValue();
+        Vector3 mouseWorldPosition = UnityEngine.Camera.main.ScreenToWorldPoint(new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, -UnityEngine.Camera.main.transform.position.z));
+        Vector2 aimDirection = (mouseWorldPosition - transform.position).normalized;
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, 2f, _enemyLayer);
+        foreach (Collider2D enemy in enemies)
+        {
+            Vector2 enemyDirection = (enemy.bounds.center - transform.position).normalized;
+            if (Vector2.Angle(aimDirection, enemyDirection) <= 30f)
+            {
+                enemy.GetComponent<Enemy>().Damage();
+            }
+        }  
             
-        Collider2D map = Physics2D.OverlapBox(transform.position, new Vector2(2.5f, 1.4f), 0f, _groundLayer);
-        if (map != null && !IsGrounded())
-        {      
-            float horizontalDirection = transform.position.x - map.bounds.center.x;
-            Vector2 direction = new Vector2(horizontalDirection, 15f).normalized;
-            rb.AddForce(direction * 8f, ForceMode2D.Impulse);
-            rb.linearVelocityY += 8f;
-        }      
+        Collider2D[] maps = Physics2D.OverlapBoxAll(transform.position, new Vector2(2.5f, 1.4f), 0f, _groundLayer);
+        foreach (Collider2D map in maps)
+        {
+            if (map != null && !IsGrounded())
+            {      
+                Vector2 groundDirection = ((Vector2)transform.position - map.ClosestPoint(transform.position)).normalized ;
+                if (Vector2.Angle(aimDirection, groundDirection) <= 30f)
+                {
+                    continue;
+                }
+                
+                float horizontalDirection = transform.position.x - map.bounds.center.x;
+                Vector2 direction = new Vector2(horizontalDirection, 15f).normalized;
+                rb.AddForce(direction * 8f, ForceMode2D.Impulse);
+                rb.linearVelocityY += 8f;
+                break;
+            }          
+        }
+        
+        Debug.Log(mouseWorldPosition);
         
     }
     private void OnDrawGizmos()
